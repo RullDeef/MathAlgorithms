@@ -1,9 +1,10 @@
-a, b in V
+for a, b in V
 A, B, C not in V
 
-Aa -> aABa
-Bab -> bBa
-A -> C
-B ->
-C ->.
--> A
+alg DoubleRev
+    Aa -> aABa
+    Bab -> bBa
+    A -> C
+    B ->
+    C ->.
+    -> A

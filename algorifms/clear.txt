@@ -1,6 +1,7 @@
-a in V
+for a in V
 < not in V
 
-<a -> <
-< ->.
--> <
+alg Clear
+    <a -> <
+    < ->.
+    -> <

@@ -1,22 +1,23 @@
-a, b in V
+for a, b in V
 A, B, C, D, #, $, @ not in V
 
-#a -> a#
-# -> B
+alg IsDouble
+    #a -> a#
+    # -> B
 
-aCB -> DBa
-Ca -> aC
+    aCB -> DBa
+    Ca -> aC
 
-ADa -> aAC
-aD -> Da
+    ADa -> aAC
+    aD -> Da
 
-ACB -> $@
-ADB -> $@
+    ACB -> $@
+    ADB -> $@
 
-@ab -> b@a
-$a -> $@a
+    @ab -> b@a
+    $a -> $@a
 
-a$@a -> $
-$ ->.
+    a$@a -> $
+    $ ->.
 
--> AC#
+    -> AC#

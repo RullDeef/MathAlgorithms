@@ -1,11 +1,12 @@
-a, b in V
+for a, b in V
 *, %, @, # not in V
 
-*a -> a*
-ab% -> b%a
-ab* -> b%a*
-* -> #
-% -> @
-@ ->
-# ->.
--> *
+alg Reverse
+    *a -> a*
+    ab% -> b%a
+    ab* -> b%a*
+    * -> #
+    % -> @
+    @ ->
+    # ->.
+    -> *

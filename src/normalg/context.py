@@ -3,19 +3,31 @@ class Symbol(object):
         self.value = sym
 
     def __repr__(self) -> str:
-        return f"S({self.value})"
+        return f"S[{id(self) % 1000}]({self.value})"
+
+    def __str__(self) -> str:
+        return self.value
 
 class RegularSymbol(Symbol):
     def __repr__(self) -> str:
-        return f"R({self.value})"
+        return f"R[{id(self) % 1000}]({self.value})"
+
+    def __str__(self) -> str:
+        return self.value
 
 class MetaSymbol(Symbol):
     def __repr__(self) -> str:
-        return f"M({self.value})"
+        return f"M[{id(self) % 1000}]({self.value})"
+
+    def __str__(self) -> str:
+        return self.value
 
 class SymbolSequence(object):
     def __init__(self):
         self.seq = []
+
+    def __repr__(self):
+        return "".join(map(repr, self.seq))
 
     def __str__(self) -> str:
         return "".join(map(str, self.seq))
@@ -25,7 +37,7 @@ class SymbolSequence(object):
 
     def __getitem__(self, i: int):
         return self.seq[i]
-    
+
     def __setitem__(self, i: int, sym: 'Symbol'):
         if not isinstance(sym, Symbol):
             print("bad set item! Sym has unexpected type")
@@ -95,25 +107,27 @@ class Context(object):
         return Symbol(sym)
 
     def use_alphabet(self, alphabet: str):
-        self.alphabet = [Symbol(c) for c in alphabet]
+        if len(self.alphabet) == 0:
+            alphabet = sorted(list(set(alphabet)))
+            self.alphabet = [Symbol(c) for c in alphabet]
         return self.alphabet
 
     # translates string using regular and meta symbols
     # for lhs and rhs of rule templates
-    def wrap_string(self, string: str) -> 'SymbolSequence':
+    def wrap_string(self, string: str) -> SymbolSequence:
         seq = SymbolSequence()
         for c in string:
             seq.feed(self.get_sym(c))
         return seq
 
     # converts string to symbol objects using alphabet
-    def prepare_string(self, string: str) -> 'SymbolSequence':
+    def prepare_string(self, string: str) -> SymbolSequence:
         seq = SymbolSequence()
         for char in string:
-            sym = Symbol(char)
             for s in self.alphabet:
                 if s.value == char:
-                    sym = s
+                    seq.feed(s)
                     break
-            seq.feed(sym)
+            else:
+                seq.feed(Symbol(char))
         return seq

@@ -1,8 +1,9 @@
-a, b in V
+for a, b in V
 A, B not in V
 
-Aa -> aBaA
-Bab -> bBa
-B ->
-A ->.
--> A
+alg Double
+    Aa -> aBaA
+    Bab -> bBa
+    B ->
+    A ->.
+    -> A

@@ -1,12 +1,20 @@
+from normalg.context import SymbolSequence
+
 class Configuration(object):
-    def __init__(self, string: list, rules: list):
+    def __init__(self, string: SymbolSequence):
         self.string = string
-        self.rules = rules
+        self.final = False
 
     def __repr__(self) -> str:
-        res = " ".join(repr(c) for c in self.string)
-        rules = "\n".join(repr(r) for r in self.rules)
-        return f"conf: {res}\nrules:\n{rules}"
+        return f"Conf({repr(self.string)})"
 
     def __str__(self) -> str:
-        return "".join(c.value for c in self.string)
+        return str(self.string)
+    
+    def empty(self) -> bool:
+        return len(self.string) == 0
+
+    def clone(self) -> 'Configuration':
+        new_conf = Configuration(self.string.clone())
+        new_conf.final = self.final
+        return new_conf

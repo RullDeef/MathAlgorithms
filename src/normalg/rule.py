@@ -1,4 +1,5 @@
 from normalg.context import Context, SymbolSequence
+from normalg.configuration import Configuration
 
 # represents particular substitution
 class Rule(object):
@@ -15,14 +16,18 @@ class Rule(object):
         return f"{self.lhs} ->{'.' if self.final else ''} {self.rhs}"
 
     # checks if it can be applied to given sequence string
-    def applyable(self, string: SymbolSequence):
+    def applyable_seq(self, string: SymbolSequence) -> bool:
         return string.has_subseq(self.lhs)
 
-    def apply(self, string: SymbolSequence) -> SymbolSequence:
-        next_string = string.clone()
-        next_string.replace(self.lhs, self.rhs)
-        return next_string
+    def applyable(self, conf: Configuration) -> bool:
+        return conf.string.has_subseq(self.lhs)
 
+    def apply(self, conf: Configuration) -> Configuration:
+        if not conf.final:
+            conf = conf.clone()
+            conf.string.replace(self.lhs, self.rhs)
+            conf.final = self.final
+        return conf
 
 class RuleTemplate(object):
     def __init__(self,

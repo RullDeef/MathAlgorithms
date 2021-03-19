@@ -1,0 +1,28 @@
+for a in V
+A, B, C not in V
+
+alg IsMirrored is
+    B * (A <L * R>)
+
+alg L
+    Aa ->. aA
+    AB ->. AB
+    -> A
+
+alg R
+    Ca -> aC
+    aC ->. Ba
+    C ->. B
+    aB ->. Ba
+    -> C
+
+alg A
+    aAB -> AB
+    ABa -> AB
+    AB ->.
+    ->.
+
+alg B
+    aABa -> AB
+    AB ->.
+    ->.
