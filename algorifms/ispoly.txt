@@ -1,0 +1,19 @@
+a, b in V
+A, B, C, D, #, $ not in V
+
+#a -> a#
+# -> B
+
+aCB -> DBa
+Ca -> aC
+
+ADa -> aAC
+aD -> Da
+
+ACB -> $
+ADBa -> $
+
+a$a -> $
+$ ->.
+
+-> AC#

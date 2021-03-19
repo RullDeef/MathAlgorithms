@@ -1,0 +1,8 @@
+a, b in V
+A, B not in V
+
+Aa -> aBaA
+Bab -> bBa
+B ->
+A ->.
+-> A
