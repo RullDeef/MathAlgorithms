@@ -1,0 +1,14 @@
+for a, b in V
+@, #, $ not in V
+
+alg Triple
+    #a -> a@a$a#
+    @ab -> b@a
+    $ab -> b$a
+
+    $a@b -> @b$a
+    @ ->
+    $ ->
+
+    # ->.
+    -> #

@@ -81,12 +81,13 @@ class Condition(MarkovAlgorifm):
         self.cond = cond
         self.then = then
         self._else = _else
+        self.name = f"{cond.name} ({then.name} | {_else.name})"
 
     def __repr__(self) -> str:
         c = self.cond.name
         t = self.then.name
         e = self._else.name
-        res = f"alg {self.name} is {c} ( {t} | {e} )"
+        res = f"alg {self.name} is {c} ({t} | {e})"
         return f"{res}\n{repr(self.cond)}\n{repr(self.then)}\n{repr(self._else)}"
 
     def __str__(self) -> str:
@@ -113,6 +114,7 @@ class LoopAccept(MarkovAlgorifm):
     def __init__(self, cond: MarkovAlgorifm, body: MarkovAlgorifm):
         self.cond = cond
         self.body = body
+        self.name = f"{cond.name} {{{body.name}}}"
 
     def __repr__(self) -> str:
         c = self.cond.name
@@ -140,9 +142,9 @@ class LoopAccept(MarkovAlgorifm):
 
 class LoopReject(MarkovAlgorifm):
     def __init__(self, name: str, cond: MarkovAlgorifm, body: MarkovAlgorifm):
-        self.name = name
         self.cond = cond
         self.body = body
+        self.name = f"{cond.name} <{body.name}>"
 
     def __repr__(self) -> str:
         c = self.cond.name
@@ -238,10 +240,19 @@ def parse_combination(tokens: list, context: Context, algorifms: OrderedDict) ->
     while len(tokens) > 0:
         algo_inserted = False
         token = tokens.pop(0)
-        if token in [")", ">", "}"]:
+        if token == "|":
+            tokens.insert(0, token)
+            break
+        elif token in [")", ">", "}"]:
             break
         elif token == "(":
-            algo_stack.append(parse_combination(tokens, context, algorifms))
+            next_comb = parse_combination(tokens, context, algorifms)
+            if tokens[0] == "|":
+                tokens.pop(0)
+                cond = algo_stack.pop()
+                _else = parse_combination(tokens, context, algorifms)
+                next_comb = Condition(cond, next_comb, _else)
+            algo_stack.append(next_comb)
             #print("appended '(' combo:", [str(a) for a in algo_stack])
             algo_inserted = True
         elif token == "*":

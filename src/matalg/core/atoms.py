@@ -1,32 +1,28 @@
+from itertools import product
+
 class Symbol(object):
-    def __init__(self, sym: str):
-        self.value = sym
+    class_symbol = "S"
+
+    def __init__(self, value: str):
+        self.value = value
 
     def __repr__(self) -> str:
-        return f"S[{id(self) % 1000}]({self.value})"
+        return f"{self.class_symbol}{id(self) % 1000}({self.value})"
 
     def __str__(self) -> str:
         return self.value
 
 class RegularSymbol(Symbol):
-    def __repr__(self) -> str:
-        return f"R[{id(self) % 1000}]({self.value})"
-
-    def __str__(self) -> str:
-        return self.value
+    class_symbol = "R"
 
 class MetaSymbol(Symbol):
-    def __repr__(self) -> str:
-        return f"M[{id(self) % 1000}]({self.value})"
-
-    def __str__(self) -> str:
-        return self.value
+    class_symbol = "M"
 
 class SymbolSequence(object):
     def __init__(self):
-        self.seq = []
+        self.seq = list()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "".join(map(repr, self.seq))
 
     def __str__(self) -> str:
@@ -38,7 +34,7 @@ class SymbolSequence(object):
     def __getitem__(self, i: int):
         return self.seq[i]
 
-    def __setitem__(self, i: int, sym: 'Symbol'):
+    def __setitem__(self, i: int, sym: Symbol):
         if not isinstance(sym, Symbol):
             print("bad set item! Sym has unexpected type")
         self.seq[i] = sym
@@ -48,8 +44,8 @@ class SymbolSequence(object):
         copy.seq = list(self.seq)
         return copy
 
-    def feed(self, sym: 'Symbol'):
-        if not isinstance(sym, Symbol):
+    def feed(self, sym: Symbol):
+        if not isinstance(sym, (Symbol, RegularSymbol, MetaSymbol)):
             print("error. Sym has unexpected type")
         else:
             self.seq.append(sym)
@@ -71,27 +67,51 @@ class SymbolSequence(object):
                 if self[i + j] is not subseq[j]:
                     break
             else:
-                self.seq[i:i+sublen] = replacement.seq
+                self.seq[i:i + sublen] = replacement.seq
                 return
+
+    def bind_symbol(self, reg: RegularSymbol, sym: Symbol):
+        for i in range(len(self)):
+            if self.seq[i] == reg:
+                self.seq[i] = sym
 
 class Context(object):
     def __init__(self):
+        self.alphabet = list()
         self.meta_symbols = set()
         self.regular_symbols = list()
-        self.alphabet = list()
 
     def __repr__(self) -> str:
         regulars = " ".join(repr(a) for a in self.regular_symbols)
         meta = " ".join(repr(m) for m in self.meta_symbols)
-        return f"Context({{{regulars}}}, {{{meta}}})"
+        alpha = " ".join(repr(a) for a in self.alphabet)
+        return f"Context({{{regulars}}}, {{{meta}}}, [{alpha}])"
+
+    def __str__(self) -> str:
+        regulars = " ".join(str(a) for a in self.regular_symbols)
+        meta = " ".join(str(m) for m in self.meta_symbols)
+        alpha = "".join(str(a) for a in self.alphabet)
+        return f"(R{{{regulars}}}, M{{{meta}}}, [{alpha}])"
+
+    def add_sym(self, sym: str):
+        if sym in map(str, self.alphabet):
+            print("duplicate of symbol in context")
+        else:
+            self.alphabet.append(Symbol(sym))
 
     def add_regular(self, sym: str):
-        self.regular_symbols.append(Symbol(sym))
+        if sym in map(str, self.regular_symbols):
+            print("duplicate of regular symbol in context")
+        else:
+            self.regular_symbols.append(RegularSymbol(sym))
 
     def add_meta(self, sym: str):
-        self.meta_symbols.add(MetaSymbol(sym))
+        if sym in map(str, self.meta_symbols):
+            print("duplicate of meta symbol in context")
+        else:
+            self.meta_symbols.add(MetaSymbol(sym))
 
-    def get_sym(self, sym: str) -> 'Symbol':
+    def get_sym(self, sym: str) -> Symbol:
         for s in self.meta_symbols:
             if s.value == sym:
                 return s
@@ -102,14 +122,15 @@ class Context(object):
 
         for s in self.alphabet:
             if s.value == sym:
-                return sym
+                return s
 
+        print("strange sym!", sym)
         return Symbol(sym)
 
-    def use_alphabet(self, alphabet: str):
-        if len(self.alphabet) == 0:
-            alphabet = sorted(list(set(alphabet)))
-            self.alphabet = [Symbol(c) for c in alphabet]
+    def use_alphabet_from_string(self, string: str):
+        for c in string:
+            if c not in list(map(str, self.alphabet)):
+                self.alphabet.append(Symbol(c))
         return self.alphabet
 
     # translates string using regular and meta symbols
@@ -129,5 +150,20 @@ class Context(object):
                     seq.feed(s)
                     break
             else:
+                print("bad input character at prepare_string")
                 seq.feed(Symbol(char))
         return seq
+
+    # (a, a, a) (a, a, b) (a, b, a) (a, b, b) ...
+    def __iterate_over_regulars(self, amount=0):
+        if amount == 1:
+            for sym in self.alphabet:
+                yield sym,
+        elif amount > 1:
+            for sym in self.alphabet:
+                for other in self.__iterate_over_regulars(amount - 1):
+                    yield sym, *other
+
+    def map_regulars(self, regulars: list):
+        for symbols in self.__iterate_over_regulars(len(regulars)):
+            yield zip(regulars, symbols)

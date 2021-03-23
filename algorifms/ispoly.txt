@@ -1,7 +1,13 @@
 for a, b in V
 A, B, C, D, #, $ not in V
 
-alg IsPoly
+alg IsPoly is
+    IsPolyDel ( IsPolyDel | Id )
+
+alg Id
+    ->.
+
+alg IsPolyDel
     #a -> a#
     # -> B
 
