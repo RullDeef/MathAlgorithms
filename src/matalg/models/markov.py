@@ -7,9 +7,6 @@ class MarkovConfiguration(AbstractConfiguration):
         super().__init__(context)
         self.__string = string
 
-    def __str__(self) -> str:
-        return self.representation()
-
     @property
     def string(self) -> SymbolSequence:
         return self.__string
@@ -17,9 +14,12 @@ class MarkovConfiguration(AbstractConfiguration):
     def representation(self) -> str:
         return str(self.__string)
 
+    def is_empty(self) -> bool:
+        return len(self.__string) == 0
+
 
 # represents particular substitution
-class Rule(object):
+class Rule:
     def __init__(self, lhs: SymbolSequence, rhs: SymbolSequence, final=False):
         self.lhs = lhs
         self.rhs = rhs
@@ -87,11 +87,10 @@ class MarkovModel(AbstractModel):
         self.__rules = rules
 
     def init_configuration(self, string: str) -> MarkovConfiguration:
-        self.context.use_alphabet_from_string(string)
-        string = self.context.prepare_string(string)
+        string = super().init_configuration(string)
         return MarkovConfiguration(string, self.context)
 
-    def make_step(self, conf: MarkovConfiguration) -> MarkovConfiguration:
+    def make_step_into(self, conf: MarkovConfiguration) -> MarkovConfiguration:
         if not conf.is_final:
             for rule in self.__rules:
                 if rule.applicable(conf):

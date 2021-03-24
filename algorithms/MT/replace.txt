@@ -1,0 +1,14 @@
+a, b, c in V
+
+q0:
+    >> q0 , R
+    a -> q0 b, R
+    b -> q0 c, R
+    c -> q0 a, R
+    -> q1 , L
+
+q1:
+    a -> q1 a, L
+    b -> q1 b, L
+    c -> q1 c, L
+    >> qf , S

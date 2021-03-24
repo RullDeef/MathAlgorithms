@@ -13,6 +13,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
     entry_points={"console_scripts": ["matalg=matalg.executor:main"]},
-    # setup_requires=["pytest-runner"],
-    # tests_require=["pytest"]
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"]
 )

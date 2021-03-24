@@ -6,6 +6,9 @@ class AbstractConfiguration(metaclass=ABCMeta):
         self.__context = context
         self.__final = False
 
+    def __str__(self) -> str:
+        return self.representation()
+
     @property
     def context(self) -> Context:
         return self.__context
@@ -16,6 +19,10 @@ class AbstractConfiguration(metaclass=ABCMeta):
 
     def make_final(self):
         self.__final = True
+
+    @abstractmethod
+    def is_empty(self) -> bool:
+        pass
 
     @abstractmethod
     def representation(self) -> str:

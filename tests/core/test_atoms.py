@@ -17,9 +17,9 @@ def test_SymbolSequence():
     sym2 = RegularSymbol("b")
     sym3 = MetaSymbol("C")
 
-    s.feed(sym1)
-    s.feed(sym2)
-    s.feed(sym3)
+    s.push_back(sym1)
+    s.push_back(sym2)
+    s.push_back(sym3)
     assert len(s) == 3
     assert str(s) == "abC"
 

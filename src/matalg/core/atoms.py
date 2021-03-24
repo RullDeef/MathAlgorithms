@@ -1,5 +1,6 @@
 from itertools import product
 
+
 class Symbol(object):
     class_symbol = "S"
 
@@ -12,11 +13,17 @@ class Symbol(object):
     def __str__(self) -> str:
         return self.value
 
+
 class RegularSymbol(Symbol):
     class_symbol = "R"
 
+
 class MetaSymbol(Symbol):
     class_symbol = "M"
+
+MetaSymbol.Marker = MetaSymbol("*")
+MetaSymbol.Space = MetaSymbol(" ")
+
 
 class SymbolSequence(object):
     def __init__(self):
@@ -32,6 +39,8 @@ class SymbolSequence(object):
         return len(self.seq)
 
     def __getitem__(self, i: int):
+        if i == 0 and len(self.seq) == 0:
+            return None
         return self.seq[i]
 
     def __setitem__(self, i: int, sym: Symbol):
@@ -44,11 +53,35 @@ class SymbolSequence(object):
         copy.seq = list(self.seq)
         return copy
 
-    def feed(self, sym: Symbol):
-        if not isinstance(sym, (Symbol, RegularSymbol, MetaSymbol)):
-            print("error. Sym has unexpected type")
+    def pop_back(self) -> Symbol:
+        if len(self) == 0:
+            return None
         else:
-            self.seq.append(sym)
+            s = self.seq[-1]
+            self.seq = self.seq[:-1]
+            return s
+
+    def pop_front(self) -> Symbol:
+        if len(self) == 0:
+            return None
+        else:
+            s = self.seq[0]
+            self.seq = self.seq[1:]
+            return s
+
+    def push_back(self, sym: Symbol):
+        if sym is not None:
+            if not isinstance(sym, (Symbol, RegularSymbol, MetaSymbol)):
+                print("error. Sym has unexpected type")
+            else:
+                self.seq.append(sym)
+
+    def push_front(self, sym: Symbol):
+        if sym is not None:
+            if not isinstance(sym, (Symbol, RegularSymbol, MetaSymbol)):
+                print("error. Sym has unexpected type")
+            else:
+                self.seq = [sym] + self.seq
 
     def has_subseq(self, subseq: 'SymbolSequence') -> bool:
         sublen = len(subseq)
@@ -74,6 +107,7 @@ class SymbolSequence(object):
         for i in range(len(self)):
             if self.seq[i] == reg:
                 self.seq[i] = sym
+
 
 class Context(object):
     def __init__(self):
@@ -124,7 +158,7 @@ class Context(object):
             if s.value == sym:
                 return s
 
-        print("strange sym!", sym)
+        raise Exception("strange sym!" + str(sym))
         return Symbol(sym)
 
     def use_alphabet_from_string(self, string: str):
@@ -138,7 +172,7 @@ class Context(object):
     def wrap_string(self, string: str) -> SymbolSequence:
         seq = SymbolSequence()
         for c in string:
-            seq.feed(self.get_sym(c))
+            seq.push_back(self.get_sym(c))
         return seq
 
     # converts string to symbol objects using alphabet
@@ -147,11 +181,11 @@ class Context(object):
         for char in string:
             for s in self.alphabet:
                 if s.value == char:
-                    seq.feed(s)
+                    seq.push_back(s)
                     break
             else:
                 print("bad input character at prepare_string")
-                seq.feed(Symbol(char))
+                seq.push_back(Symbol(char))
         return seq
 
     # (a, a, a) (a, a, b) (a, b, a) (a, b, b) ...

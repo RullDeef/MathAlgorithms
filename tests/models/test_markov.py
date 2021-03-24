@@ -15,19 +15,19 @@ def test_MarkovModel():
     sym = context.get_sym("a")
     assert type(sym) is RegularSymbol
     assert str(sym) == "a"
-    left.feed(sym)
+    left.push_back(sym)
 
     sym = context.get_sym("c")
     assert type(sym) is Symbol
     assert str(sym) == "c"
-    left.feed(sym)
+    left.push_back(sym)
 
     print(left.seq)
     assert str(left) == "ac"
 
     right = SymbolSequence()
-    right.feed(context.get_sym("c"))
-    right.feed(context.get_sym("a"))
+    right.push_back(context.get_sym("c"))
+    right.push_back(context.get_sym("a"))
 
     assert str(right) == "ca"
 
@@ -43,7 +43,7 @@ def test_MarkovModel():
     print("start conf:", repr(conf.string))
 
     while not conf.is_final:
-        conf = model.make_step(conf)
+        conf = model.make_step_into(conf)
         print("conf:", repr(conf.string))
 
     print("final conf:", repr(conf.string))
