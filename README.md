@@ -20,53 +20,51 @@ python setup.py pytest
 
 ---
 
-## Algorifm format (future)
+## Normal Algorifms format
 
 ```
 // comment starts with '//'
-for a, b, c in V     // iterators for input alphabet
-A, B, C not in V     // meta symbols
 
-// you can combine algorifms using following constructions:
-// A * B        >> A(B(x))
-// A ( B | C )  >> if (A(x) == lambda) then B(x) else C(x)
-// A { B }      >> while A(x) == lambda do x := B(x)
-// A < B >      >> while A(x) <> lambda do x := B(x)
+// context definition
+a in V              // V strongly contains 'a'
+for b, c in V       // iterators for input alphabet
+A, B, C not in V    // meta symbols
 
-// 'alg' and 'is' required for complex algorifms
-alg Comb is
-    Traverse * Traverse
-
-// each simple algorifm starts with 'alg <name>'
-alg Traverse:
-    Aa -> aA         // 'a' iterates over input alphabet
-    A ->.            // final rule (with dot)
-    -> A             // emitting rule
+// normal algorifm definition
+Aa -> aaA           // meta 'A' duplicates symbol 'a'
+Ab -> bA            // 'b' iterates over input alphabet, 'A' jumps over each symbol
+A ->.               // final rule (with dot). 'A' disappears
+-> A                // emitting rule
 ```
 
-## Turing Machine format (far future)
+## Turing Machine format
 
 ```
+// context definition
 0, 1, # in V
-for a in {0, 1} // iterate over specific symbols in alphabet
 
-// Turing machine for determining constructive positive number
-tur IsCNN
-    q_0 * -> q_0 *, R
-    q_0 -> q_f , L
-    q_0 0 -> q_1 0, R
-    q_0 1 -> q_f 1, L
+// rule format:
+// <sym1> -> <state> <sym2>, <step>
+// sym1 - look symbol (or empty string)
+// sym2 - replacement
+// state - next state
+// step - one of L, S or R
 
-/* possible syntax simplification:
-    q_0:
-        * -> q_0 *, R
-        -> q_f , L
-        0 -> q_1 0, R
-        1 -> q_f 1, L
+// special case, when sym1 = sym2 = starting marker:
+// >> <state>, <step>
 
-    q_1:
-        ...
-*/
+// 'q0'/'qf' - always starting/ending state
+
+q0: // 'replacer' state
+    >> q0, R        // '>>' used when cursor meets starting marker
+    0 -> q0 1, R    // replace '0' with '1'
+    1 -> q0 0, R    // replace '1' with '0'
+    -> q1, L        // empty left side = meets space symbol. Goto state q1
+
+q1: // 'go back till starting marker' state
+    0 -> q1 0, L    // leave all as it is
+    1 -> q1 1, L    // keep going
+    >> qf, S        // stop work
 ```
 
 ---
@@ -76,9 +74,9 @@ tur IsCNN
 - **matalg** - algorithms executor
 
 ```
-usage: nalg [-h] [-f FILE] [-t | --trace | --no-trace] [input]
+usage: matalg [-h] [-f FILE] [-t] [-i TIMEOUT] [-T] [-M] [input]
 
-Executes algorithms.
+Executes algorithm models.
 
 positional arguments:
   input                 input string
@@ -86,11 +84,14 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  algorithm source file
-  -t, --trace, --no-trace
-                        trace execution by steps
+  -t, --trace           trace execution by steps
+  -i TIMEOUT, --timeout TIMEOUT
+                        set timeout [default=1 sec]
+  -T                    parse as turing machine
+  -M                    parse as markov algorifm 
 ```
 
-Example algorithm that **doubles** input word:
+Example normal algorifm that **doubles** input word:
 ```
 // double.txt
 for a, b in V
@@ -104,9 +105,13 @@ A ->.
 ```
 
 ```
-matalg -f ./double.txt --trace "abcb"
+matalg -f ./double.txt -M --trace "abcb"
 
 start:  abcb
+next:   Aabcb
 ...
+next:   abcbabcbA
 result: abcbabcb
 ```
+
+More examples you can find in directory `./algorithms`.

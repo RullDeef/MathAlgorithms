@@ -33,5 +33,3 @@ def test_TuringParser():
         conf = model.make_step_into(conf)
         print(conf)
         i += 1
-
-    assert False

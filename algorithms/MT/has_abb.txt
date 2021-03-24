@@ -1,0 +1,38 @@
+a, b, c in V
+
+q0:
+    >> q0 , R
+    a -> q1 a, R
+    b -> q0 b, R
+    c -> q0 c, R
+    -> qb , L
+
+q1:
+    a -> q1 a, R
+    b -> q2 b, R
+    b -> q0 c, R
+    -> qb , L
+
+q2:
+    a -> q1 a, R
+    b -> q3 b, R
+    c -> q0 c, R
+    -> qb , L
+
+q3:
+    a -> q3 a, R
+    b -> q3 b, R
+    c -> q3 c, R
+    -> qg , L
+
+qg:
+    a -> qg , L
+    b -> qg , L
+    c -> qg , L
+    >> qf , S
+
+qb: // bad state (not found)
+    a -> qb a, L
+    b -> qb b, L
+    c -> qb c, L
+    >> qf , S

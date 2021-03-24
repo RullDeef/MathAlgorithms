@@ -1,9 +1,0 @@
-for a, b in V
-A, B not in V
-
-alg Double
-    Aa -> aBaA
-    Bab -> bBa
-    B ->
-    A ->.
-    -> A
